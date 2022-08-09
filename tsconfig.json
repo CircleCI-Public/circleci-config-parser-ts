@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "es6",
+    "module": "commonjs",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "**/*.d.ts", "**/*.test.ts"],
+  "typedocOptions": {
+    "entryPoints": ["./src/index.ts"],
+    "out": "docs"
+  }
+}
