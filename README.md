@@ -1,11 +1,8 @@
 # CircleCI Config Parser
 
-Parse your existing CircleCI YAML file into TypeScript with the
-[CircleCI-Config-SDK](https://github.com/CircleCI-Public/circleci-config-sdk-ts).
-Easily translate back and forth between YAML and a CircleCI-Config-SDK Config
-object.
+A parsing library for CircleCI configuration files, powered by the [CircleCI Config SDK](https://github.com/CircleCI-Public/circleci-config-sdk-ts)
 
-Used by the
+> Used by the
 [CircleCI Visual Config Editor](https://github.com/CircleCI-Public/visual-config-editor)
 to generate an interactive and editable visual representation of your CircleCI
 config.
