@@ -20,7 +20,7 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@circleci/circleci-config-sdk": "v0.9.0",
+    "@circleci/circleci-config-sdk": "0.9.0",
     "ajv": "^8.11.0",
     "ajv-merge-patch": "^5.0.1",
     "better-ajv-errors": "^1.2.0",
