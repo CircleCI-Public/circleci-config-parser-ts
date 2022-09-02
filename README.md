@@ -31,11 +31,51 @@ $ yarn add @circleci/circleci-config-parser
 In Node.js:
 
 ```typescript
-import CircleCI from '@circleci/circleci-config-parser';
+import ConfigParser from '@circleci/circleci-config-parser';
 ```
 
 In Browser:
 
 ```javascript
-const CircleCI = require('@circleci/circleci-config-parser');
+const ConfigParser = require('@circleci/circleci-config-parser');
+```
+
+Parsing a 
+
+```
+const jobIn = {
+    docker: [{ image: 'cimg/node:lts' }],
+    resource_class: 'medium',
+    steps: [
+        {
+        run: {
+            command: 'echo << parameters.greeting >>',
+        },
+        },
+    ],
+    parameters: {
+        greeting: {
+        type: 'string',
+        },
+    },
+}
+
+ConfigParser.parseJob
+
+new CircleCI.reusable.ParameterizedJob(
+    'my_job',
+    new CircleCI.executors.DockerExecutor('cimg/node:lts'),
+    new CircleCI.parameters.CustomParametersList([
+      new CircleCI.parameters.CustomParameter('greeting', 'string'),
+    ]),
+    [
+      new CircleCI.commands.Run({
+        command: 'echo << parameters.greeting >>',
+      }),
+    ],
+);
+
+
+
+
 ```
