@@ -1,6 +1,6 @@
 {
   "name": "@circleci/circleci-config-parser",
-  "version": "0.0.0",
+  "version": "0.0.0-development",
   "description": "A parsing library for CircleCI configuration files, powered by the CircleCI Config SDK",
   "main": "dist/index.js",
   "directories": {
