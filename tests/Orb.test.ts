@@ -1,12 +1,14 @@
+import * as CircleCI from '@circleci/circleci-config-sdk';
 import { parse } from 'yaml';
-import * as CircleCI from '../src/index';
-import nodeManifest from './nodeManifest.json';
+import { parsers } from '../src';
+import { parseOrbManifest } from '../src/lib/Orb';
+import nodeInputManifest from './nodeManifest.json';
 
 describe('Use an OrbImport within a config', () => {
   const orbName = 'my-orb';
   const orbNamespace = 'circleci';
   const orbVersion = '1.0.0';
-  const manifest: CircleCI.types.orb.OrbImportManifest = {
+  const manifest: CircleCI.types.orb.OrbImportManifest = parseOrbManifest({
     jobs: {
       say_hello: {
         greeting: {
@@ -29,12 +31,20 @@ describe('Use an OrbImport within a config', () => {
         },
       },
     },
-  };
+  });
+
+  it('Should parse manifest', () => {
+    expect(manifest.executors['python'].parameters.length).toBe(1);
+    expect(manifest.jobs['say_hello'].parameters.length).toBe(1);
+    expect(manifest.commands['say_it'].parameters.length).toBe(1);
+  });
+
   const exampleOrb = new CircleCI.orb.OrbImport(
     orbName,
     orbNamespace,
     orbName,
     orbVersion,
+    undefined,
     manifest,
   );
 
@@ -43,6 +53,7 @@ describe('Use an OrbImport within a config', () => {
     orbNamespace,
     orbName,
     '1.1.1',
+    undefined,
     manifest,
   );
 
@@ -58,7 +69,7 @@ describe('Use an OrbImport within a config', () => {
     );
   });
 
-  const orbImport = CircleCI.parsers.parseOrbImport(
+  const orbImport = parsers.parseOrbImport(
     {
       'my-orb': `${orbNamespace}/${'my-orb'}@${orbVersion}`,
     },
@@ -74,9 +85,7 @@ describe('Use an OrbImport within a config', () => {
     const jobName = 'my-orb/say_hello';
     const jobParameters = { greeting: 'hi %user%' };
     const refShape = { [jobName]: jobParameters };
-    const orbJobRef = CircleCI.parsers.parseOrbRef(refShape, 'jobs', [
-      exampleOrb,
-    ]);
+    const orbJobRef = parsers.parseOrbRef(refShape, 'jobs', [exampleOrb]);
 
     expect(
       orbJobRef
@@ -88,10 +97,7 @@ describe('Use an OrbImport within a config', () => {
   it('Should not parse a regular job as an orb ref', () => {
     const jobName = 'say_hello';
     const jobParameters = { greeting: 'hi %user%' };
-    const badJobRef = CircleCI.parsers.parseOrbRef(
-      { [jobName]: jobParameters },
-      'jobs',
-    );
+    const badJobRef = parsers.parseOrbRef({ [jobName]: jobParameters }, 'jobs');
 
     expect(badJobRef).toEqual(undefined);
   });
@@ -117,7 +123,7 @@ describe('Use an OrbImport within a config', () => {
   const orbRefExecutor = new CircleCI.reusable.ReusedExecutor(pythonExecutor, {
     version: '1.2.3',
   });
-  const orbRefCommand = new CircleCI.reusable.ReusableCommand(sayItCommand, {
+  const orbRefCommand = new CircleCI.reusable.ReusedCommand(sayItCommand, {
     what: 'cheese',
   });
   const job = new CircleCI.Job('test', orbRefExecutor, [orbRefCommand]);
@@ -133,7 +139,7 @@ describe('Use an OrbImport within a config', () => {
 
   it('Should parse orb ref job in workflow', () => {
     expect(
-      CircleCI.parsers
+      parsers
         .parseWorkflow(wfName, contents, [], [exampleOrb])
         .generateContents(),
     ).toEqual(contents);
@@ -141,7 +147,7 @@ describe('Use an OrbImport within a config', () => {
 
   it('Should parse reused orb ref executor', () => {
     expect(
-      CircleCI.parsers
+      parsers
         .parseExecutor(orbRefExecutor.generate(), [], [exampleOrb])
         .generate(),
     ).toEqual(orbRefExecutor.generate());
@@ -149,7 +155,7 @@ describe('Use an OrbImport within a config', () => {
 
   it('Should parse reused orb ref command', () => {
     expect(
-      CircleCI.parsers
+      parsers
         .parseStep(
           'my-orb/say_it',
           orbRefCommand.generateContents(),
@@ -197,20 +203,22 @@ describe('Use an OrbImport within a config', () => {
       },
     };
 
-    const regenerated = parse(config.generate());
+    const regenerated = parse(config.stringify());
 
     expect(regenerated).toEqual(expected);
     expect(
       parse(
-        CircleCI.parsers
+        parsers
           .parseConfig(regenerated, {
             'my-orb': manifest,
           })
-          .generate(),
+          .stringify(),
       ),
     ).toEqual(regenerated);
   });
 });
+
+const nodeManifest = parseOrbManifest(nodeInputManifest);
 
 describe('Use a Node orb within a config', () => {
   const orbName = 'node';
@@ -222,6 +230,7 @@ describe('Use a Node orb within a config', () => {
     orbNamespace,
     orbName,
     orbVersion,
+    undefined,
     nodeManifest,
   );
 
@@ -237,7 +246,7 @@ describe('Use a Node orb within a config', () => {
     );
   });
 
-  const orbImport = CircleCI.parsers.parseOrbImport(
+  const orbImport = parsers.parseOrbImport(
     {
       node: `${orbNamespace}/${'node'}@${orbVersion}`,
     },
@@ -253,7 +262,7 @@ describe('Use a Node orb within a config', () => {
     const jobName = 'node/test';
     const jobParameters = { greeting: 'hi %user%' };
     const refShape = { [jobName]: jobParameters };
-    const orbJobRef = CircleCI.parsers.parseOrbRef(refShape, 'jobs', [nodeOrb]);
+    const orbJobRef = parsers.parseOrbRef(refShape, 'jobs', [nodeOrb]);
 
     expect(
       orbJobRef
@@ -265,10 +274,7 @@ describe('Use a Node orb within a config', () => {
   it('Should not parse a regular job as an orb ref', () => {
     const jobName = 'test';
     const jobParameters = { greeting: 'hi %user%' };
-    const badJobRef = CircleCI.parsers.parseOrbRef(
-      { [jobName]: jobParameters },
-      'jobs',
-    );
+    const badJobRef = parsers.parseOrbRef({ [jobName]: jobParameters }, 'jobs');
 
     expect(badJobRef).toEqual(undefined);
   });
@@ -285,10 +291,10 @@ describe('Use a Node orb within a config', () => {
   const orbRefExecutor = new CircleCI.reusable.ReusedExecutor(nodeDefault, {
     tag: '16.16',
   });
-  const orbRefCommand = new CircleCI.reusable.ReusableCommand(installPackages, {
+  const orbRefCommand = new CircleCI.reusable.ReusedCommand(installPackages, {
     'cache-version': 'v1',
   });
-  const orbRefCommand2 = new CircleCI.reusable.ReusableCommand(installYarn);
+  const orbRefCommand2 = new CircleCI.reusable.ReusedCommand(installYarn);
   const job = new CircleCI.Job('test', orbRefExecutor, [
     orbRefCommand,
     orbRefCommand2,
@@ -306,15 +312,13 @@ describe('Use a Node orb within a config', () => {
 
   it('Should parse orb ref job in workflow', () => {
     expect(
-      CircleCI.parsers
-        .parseWorkflow(wfName, contents, [], [nodeOrb])
-        .generateContents(),
+      parsers.parseWorkflow(wfName, contents, [], [nodeOrb]).generateContents(),
     ).toEqual(contents);
   });
 
   it('Should parse reused orb ref executor', () => {
     expect(
-      CircleCI.parsers
+      parsers
         .parseExecutor(orbRefExecutor.generate(), [], [nodeOrb])
         .generate(),
     ).toEqual(orbRefExecutor.generate());
@@ -322,7 +326,7 @@ describe('Use a Node orb within a config', () => {
 
   it('Should parse reused orb ref command', () => {
     expect(
-      CircleCI.parsers
+      parsers
         .parseStep(
           'node/install-packages',
           orbRefCommand.generateContents(),
@@ -335,7 +339,7 @@ describe('Use a Node orb within a config', () => {
 
   it('Should parse reused orb ref command without body', () => {
     expect(
-      CircleCI.parsers
+      parsers
         .parseStep('node/install-packages', undefined, [], [nodeOrb])
         .generate(),
     ).toEqual('node/install-packages');
@@ -379,16 +383,16 @@ describe('Use a Node orb within a config', () => {
       },
     };
 
-    const regenerated = parse(config.generate());
+    const regenerated = parse(config.stringify());
 
     expect(regenerated).toEqual(expected);
     expect(
       parse(
-        CircleCI.parsers
+        parsers
           .parseConfig(regenerated, {
             node: nodeManifest,
           })
-          .generate(),
+          .stringify(),
       ),
     ).toEqual(regenerated);
   });

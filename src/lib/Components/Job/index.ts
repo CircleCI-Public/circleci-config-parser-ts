@@ -1,8 +1,8 @@
 import * as CircleCI from '@circleci/circleci-config-sdk';
-import { parseGenerable } from '../../../Config/exports/Parsing';
-import { parseSteps } from '../../Commands/parsers';
-import { parseExecutor } from '../../Executors/parsers';
-import { parseParameterList } from '../../Parameters/parsers';
+import { parseGenerable } from '../../Config/exports/Parsing';
+import { parseSteps } from '../Commands';
+import { parseExecutor } from '../Executors';
+import { parseParameterList } from '../Parameters';
 
 /**
  * Parse a config's list of jobs into a list of Job instances.
@@ -17,9 +17,10 @@ export function parseJobList(
   jobListIn: { [key: string]: unknown },
   ReusableCommands?: CircleCI.reusable.ReusableCommand[],
   reusableExecutors?: CircleCI.reusable.ReusableExecutor[],
+  orbs?: CircleCI.orb.OrbImport[],
 ): CircleCI.Job[] {
   return Object.entries(jobListIn).map(([name, args]) =>
-    parseJob(name, args, ReusableCommands, reusableExecutors),
+    parseJob(name, args, ReusableCommands, reusableExecutors, orbs),
   );
 }
 
@@ -39,6 +40,7 @@ export function parseJob(
   jobIn: unknown,
   ReusableCommands?: CircleCI.reusable.ReusableCommand[],
   reusableExecutors?: CircleCI.reusable.ReusableExecutor[],
+  orbs?: CircleCI.orb.OrbImport[],
 ): CircleCI.Job {
   return parseGenerable<
     CircleCI.types.job.UnknownJobShape,
@@ -62,8 +64,10 @@ export function parseJob(
     (jobArgs) => {
       let parametersList;
 
-      const executor = parseExecutor(jobArgs, reusableExecutors);
-      const steps = parseSteps(jobArgs.steps, ReusableCommands);
+      console.log(orbs);
+
+      const executor = parseExecutor(jobArgs, reusableExecutors, orbs);
+      const steps = parseSteps(jobArgs.steps, ReusableCommands, orbs);
 
       if (jobArgs.parameters) {
         parametersList = parseParameterList(

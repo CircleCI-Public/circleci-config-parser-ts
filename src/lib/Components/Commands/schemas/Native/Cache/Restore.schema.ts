@@ -2,7 +2,6 @@ import { SchemaObject } from 'ajv';
 
 const RestoreSchema: SchemaObject = {
   $id: '#/commands/native/restore_cache',
-  type: 'object',
   oneOf: [
     {
       type: 'object',
@@ -18,13 +17,7 @@ const RestoreSchema: SchemaObject = {
       },
     },
     {
-      type: 'object',
-      properties: {
-        key: {
-          type: 'string',
-        },
-      },
-      required: ['key'],
+      type: 'string',
     },
   ],
 };

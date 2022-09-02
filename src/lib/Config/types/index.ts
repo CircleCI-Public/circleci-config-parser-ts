@@ -45,6 +45,7 @@ export type UnknownConfigShape = {
   commands?: Record<string, unknown>;
   parameters?: Record<string, unknown>;
   workflows: Record<string, unknown>;
+  orbs?: Record<string, unknown>;
 };
 
 export type ConfigDependencies = {
@@ -53,6 +54,7 @@ export type ConfigDependencies = {
   executorList?: CircleCI.reusable.ReusableExecutor[];
   commandList?: CircleCI.reusable.ReusableCommand[];
   parameterList?: CircleCI.parameters.CustomParametersList<CircleCI.types.parameter.literals.AnyParameterLiteral>;
+  orbImportList?: CircleCI.orb.OrbImport[];
 };
 
 export { validator, mapping };

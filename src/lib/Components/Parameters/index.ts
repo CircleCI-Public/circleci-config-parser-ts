@@ -1,6 +1,6 @@
 import * as CircleCI from '@circleci/circleci-config-sdk';
-import { errorParsing, parseGenerable } from '../../../Config/exports/Parsing';
-import { Validator } from '../../../Config/exports/Validator';
+import { errorParsing, parseGenerable } from '../../Config/exports/Parsing';
+import { Validator } from '../../Config/exports/Validator';
 
 const parameterMappings: {
   [key in Exclude<

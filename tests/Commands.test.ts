@@ -26,7 +26,7 @@ describe('Parse a "checkout" step', () => {
   const checkoutWithPath = new CircleCI.commands.Checkout({ path: './src' });
 
   it('Should produce checkout string', () => {
-    expect(checkout.generate()).toEqual(checkoutBasicResult);
+    expect(checkout.generate()).toEqual('checkout');
   });
 
   it('Should parse steps list with command as string from YAML parse result and match raw example', () => {
