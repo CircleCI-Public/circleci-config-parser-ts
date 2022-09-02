@@ -1,4 +1,4 @@
-import Ajv, { ErrorObject, nil, SchemaObject } from 'ajv';
+import Ajv, { ErrorObject, SchemaObject } from 'ajv';
 import ajvMergePatch from 'ajv-merge-patch';
 import { ValidationMap, ValidationResult } from '../types/Validator.types';
 
