@@ -12,9 +12,7 @@ describe('Parse a Workflow', () => {
 
   it('Should parse and match raw example', () => {
     expect(
-      ConfigParser.parsers.parseWorkflow('my-workflow', { jobs: ['my-job'] }, [
-        job,
-      ]),
+      ConfigParser.parseWorkflow('my-workflow', { jobs: ['my-job'] }, [job]),
     ).toEqual(myWorkflow);
   });
 });
@@ -52,14 +50,14 @@ describe('Parse a Workflow with a job', () => {
     'my-workflow': { jobs: ['my-job'] },
   };
   it('Should match the expected output', () => {
-    expect(
-      ConfigParser.parsers.parseWorkflowList(workflowListShape, [job])[0],
-    ).toEqual(myWorkflow);
+    expect(ConfigParser.parseWorkflowList(workflowListShape, [job])[0]).toEqual(
+      myWorkflow,
+    );
   });
 
   it('Should throw error if no job is provided', () => {
     expect(() => {
-      ConfigParser.parsers.parseWorkflowList(workflowListShape, []);
+      ConfigParser.parseWorkflowList(workflowListShape, []);
     }).toThrowError('Job my-job not found in config');
   });
 });
@@ -87,7 +85,7 @@ describe('Parse a Workflow with an approval job', () => {
   };
   it('Should match the expected output', () => {
     expect(
-      ConfigParser.parsers.parseWorkflow('my-workflow', workflowContents, [
+      ConfigParser.parseWorkflow('my-workflow', workflowContents, [
         jobTest,
         jobDeploy,
       ]),

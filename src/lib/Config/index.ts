@@ -85,11 +85,3 @@ export function parseConfig(
     },
   );
 }
-
-// Parser exports
-export * from '../Components/Commands';
-export * from '../Components/Executors';
-export * from '../Components/Job';
-export * from '../Components/Parameters';
-export * from '../Components/Workflow';
-export * from '../Orb';

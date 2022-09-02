@@ -39,14 +39,14 @@ describe('Parse yaml pipeline parameters', () => {
   });
 
   it('Should parse parameters', () => {
-    expect(ConfigParser.parsers.parseParameterList(parametersIn)).toEqual(
+    expect(ConfigParser.parseParameterList(parametersIn)).toEqual(
       expectedParameters,
     );
   });
 
   it('Should throw error if no parameter list is found', () => {
     expect(() => {
-      ConfigParser.parsers.parseParameterList(
+      ConfigParser.parseParameterList(
         { invalid_parameter: {} },
         CircleCI.mapping.ParameterizedComponent.JOB,
       );
@@ -111,24 +111,21 @@ describe('Parse yaml integer parameters', () => {
     }),
   );
   it('Should parse integer parameter', () => {
-    expect(
-      ConfigParser.parsers.parseParameter(parameterIn, parameterName),
-    ).toEqual(expectedParameter);
+    expect(ConfigParser.parseParameter(parameterIn, parameterName)).toEqual(
+      expectedParameter,
+    );
   });
 
   it('Should parse integer parameter', () => {
     expect(() => {
-      ConfigParser.parsers.parseParameter(
-        { type: 'not_a_type' },
-        parameterName,
-      );
+      ConfigParser.parseParameter({ type: 'not_a_type' }, parameterName);
     }).toThrowError('No validator found');
   });
 });
 describe('Parse parameter with an invalid type', () => {
   it('Should parse integer parameter', () => {
     expect(() => {
-      ConfigParser.parsers.parseParameter({}, 'invalid_parameter');
+      ConfigParser.parseParameter({}, 'invalid_parameter');
     }).toThrowError('Missing type property on parameter: invalid_parameter');
   });
 });
@@ -164,9 +161,9 @@ describe('Parse yaml string parameter and validate', () => {
     CircleCI.mapping.ParameterizedComponent.EXECUTOR,
   ].map((subtype) =>
     it(`Should parse integer parameter with subtype ${subtype}`, () => {
-      expect(
-        ConfigParser.parsers.parseParameter(parameterIn, parameterName),
-      ).toEqual(expectedParameter);
+      expect(ConfigParser.parseParameter(parameterIn, parameterName)).toEqual(
+        expectedParameter,
+      );
     }),
   );
 });
@@ -202,9 +199,9 @@ describe('Parse yaml boolean parameter and validate', () => {
   );
 
   it(`Should parse boolean parameter`, () => {
-    expect(
-      ConfigParser.parsers.parseParameter(parameterIn, parameterName),
-    ).toEqual(expectedParameter);
+    expect(ConfigParser.parseParameter(parameterIn, parameterName)).toEqual(
+      expectedParameter,
+    );
   });
 });
 
@@ -247,9 +244,9 @@ describe('Parse yaml enum parameter and validate', () => {
   );
 
   it(`Should parse enum parameter`, () => {
-    expect(
-      ConfigParser.parsers.parseParameter(parameterIn, parameterName),
-    ).toEqual(expectedParameter);
+    expect(ConfigParser.parseParameter(parameterIn, parameterName)).toEqual(
+      expectedParameter,
+    );
   });
 });
 
@@ -283,8 +280,8 @@ describe('Parse yaml env_var_name parameter and validate', () => {
   );
 
   it(`Should parse env_var_name parameter`, () => {
-    expect(
-      ConfigParser.parsers.parseParameter(parameterIn, parameterName),
-    ).toEqual(expectedParameter);
+    expect(ConfigParser.parseParameter(parameterIn, parameterName)).toEqual(
+      expectedParameter,
+    );
   });
 });

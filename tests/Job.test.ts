@@ -15,7 +15,7 @@ describe('Parse a Docker Job', () => {
   };
 
   it('Should match the expected output', () => {
-    expect(ConfigParser.parsers.parseJob(jobName, jobContents)).toEqual(job);
+    expect(ConfigParser.parseJob(jobName, jobContents)).toEqual(job);
   });
 });
 
@@ -51,7 +51,7 @@ describe('Parse Parameterized Docker Job', () => {
   };
 
   it('Can validate the job with a custom command step', () => {
-    const result = ConfigParser.parsers.parseJob('my_job', jobIn);
+    const result = ConfigParser.parseJob('my_job', jobIn);
 
     expect(result).toEqual(job);
   });
@@ -117,11 +117,7 @@ describe('Parse Docker Job With A Parameterized Custom Command', () => {
     const myConfig = new CircleCI.Config();
     myConfig.addJob(job);
     myConfig.addReusableCommand(reusableCommand);
-    const result = ConfigParser.parsers.parseJob(
-      'my_job',
-      jobIn,
-      myConfig.commands,
-    );
+    const result = ConfigParser.parseJob('my_job', jobIn, myConfig.commands);
 
     expect(result).toEqual(job);
   });

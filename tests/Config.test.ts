@@ -13,21 +13,19 @@ describe('Parse a CircleCI Config', () => {
 
   const configResult = myConfig.generate();
   it('Should produce a blank config with parameters', () => {
-    expect(ConfigParser.parsers.parseConfig(configResult)).toEqual(myConfig);
+    expect(ConfigParser.parseConfig(configResult)).toEqual(myConfig);
   });
 
   it('Should be fully circular', () => {
     setLogParsing(true);
-    expect(
-      ConfigParser.parsers.parseConfig(parse(myConfig.stringify())),
-    ).toEqual(myConfig);
+    expect(ConfigParser.parseConfig(parse(myConfig.stringify()))).toEqual(
+      myConfig,
+    );
     setLogParsing(false);
   });
 
   it('Should be fully circular and parsable as string', () => {
-    expect(ConfigParser.parsers.parseConfig(myConfig.generate())).toEqual(
-      myConfig,
-    );
+    expect(ConfigParser.parseConfig(myConfig.generate())).toEqual(myConfig);
   });
 
   it('Should throw error when parsing returns undefined', () => {

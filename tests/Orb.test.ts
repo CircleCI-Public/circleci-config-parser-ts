@@ -1,37 +1,37 @@
 import * as CircleCI from '@circleci/circleci-config-sdk';
 import { parse } from 'yaml';
-import { parsers } from '../src';
-import { parseOrbManifest } from '../src/lib/Orb';
+import * as ConfigParser from '../src';
 import nodeInputManifest from './nodeManifest.json';
 
 describe('Use an OrbImport within a config', () => {
   const orbName = 'my-orb';
   const orbNamespace = 'circleci';
   const orbVersion = '1.0.0';
-  const manifest: CircleCI.types.orb.OrbImportManifest = parseOrbManifest({
-    jobs: {
-      say_hello: {
-        greeting: {
-          type: 'string',
+  const manifest: CircleCI.types.orb.OrbImportManifest =
+    ConfigParser.parseOrbManifest({
+      jobs: {
+        say_hello: {
+          greeting: {
+            type: 'string',
+          },
         },
       },
-    },
-    commands: {
-      say_it: {
-        what: {
-          type: 'string',
+      commands: {
+        say_it: {
+          what: {
+            type: 'string',
+          },
         },
       },
-    },
-    executors: {
-      python: {
-        version: {
-          type: 'string',
-          default: '1.0.0',
+      executors: {
+        python: {
+          version: {
+            type: 'string',
+            default: '1.0.0',
+          },
         },
       },
-    },
-  });
+    });
 
   it('Should parse manifest', () => {
     expect(manifest.executors['python'].parameters.length).toBe(1);
@@ -69,7 +69,7 @@ describe('Use an OrbImport within a config', () => {
     );
   });
 
-  const orbImport = parsers.parseOrbImport(
+  const orbImport = ConfigParser.parseOrbImport(
     {
       'my-orb': `${orbNamespace}/${'my-orb'}@${orbVersion}`,
     },
@@ -85,7 +85,7 @@ describe('Use an OrbImport within a config', () => {
     const jobName = 'my-orb/say_hello';
     const jobParameters = { greeting: 'hi %user%' };
     const refShape = { [jobName]: jobParameters };
-    const orbJobRef = parsers.parseOrbRef(refShape, 'jobs', [exampleOrb]);
+    const orbJobRef = ConfigParser.parseOrbRef(refShape, 'jobs', [exampleOrb]);
 
     expect(
       orbJobRef
@@ -97,7 +97,10 @@ describe('Use an OrbImport within a config', () => {
   it('Should not parse a regular job as an orb ref', () => {
     const jobName = 'say_hello';
     const jobParameters = { greeting: 'hi %user%' };
-    const badJobRef = parsers.parseOrbRef({ [jobName]: jobParameters }, 'jobs');
+    const badJobRef = ConfigParser.parseOrbRef(
+      { [jobName]: jobParameters },
+      'jobs',
+    );
 
     expect(badJobRef).toEqual(undefined);
   });
@@ -139,30 +142,33 @@ describe('Use an OrbImport within a config', () => {
 
   it('Should parse orb ref job in workflow', () => {
     expect(
-      parsers
-        .parseWorkflow(wfName, contents, [], [exampleOrb])
-        .generateContents(),
+      ConfigParser.parseWorkflow(
+        wfName,
+        contents,
+        [],
+        [exampleOrb],
+      ).generateContents(),
     ).toEqual(contents);
   });
 
   it('Should parse reused orb ref executor', () => {
     expect(
-      parsers
-        .parseExecutor(orbRefExecutor.generate(), [], [exampleOrb])
-        .generate(),
+      ConfigParser.parseExecutor(
+        orbRefExecutor.generate(),
+        [],
+        [exampleOrb],
+      ).generate(),
     ).toEqual(orbRefExecutor.generate());
   });
 
   it('Should parse reused orb ref command', () => {
     expect(
-      parsers
-        .parseStep(
-          'my-orb/say_it',
-          orbRefCommand.generateContents(),
-          [],
-          [exampleOrb],
-        )
-        .generate(),
+      ConfigParser.parseStep(
+        'my-orb/say_it',
+        orbRefCommand.generateContents(),
+        [],
+        [exampleOrb],
+      ).generate(),
     ).toEqual(orbRefCommand.generate());
   });
 
@@ -208,17 +214,15 @@ describe('Use an OrbImport within a config', () => {
     expect(regenerated).toEqual(expected);
     expect(
       parse(
-        parsers
-          .parseConfig(regenerated, {
-            'my-orb': manifest,
-          })
-          .stringify(),
+        ConfigParser.parseConfig(regenerated, {
+          'my-orb': manifest,
+        }).stringify(),
       ),
     ).toEqual(regenerated);
   });
 });
 
-const nodeManifest = parseOrbManifest(nodeInputManifest);
+const nodeManifest = ConfigParser.parseOrbManifest(nodeInputManifest);
 
 describe('Use a Node orb within a config', () => {
   const orbName = 'node';
@@ -246,7 +250,7 @@ describe('Use a Node orb within a config', () => {
     );
   });
 
-  const orbImport = parsers.parseOrbImport(
+  const orbImport = ConfigParser.parseOrbImport(
     {
       node: `${orbNamespace}/${'node'}@${orbVersion}`,
     },
@@ -262,7 +266,7 @@ describe('Use a Node orb within a config', () => {
     const jobName = 'node/test';
     const jobParameters = { greeting: 'hi %user%' };
     const refShape = { [jobName]: jobParameters };
-    const orbJobRef = parsers.parseOrbRef(refShape, 'jobs', [nodeOrb]);
+    const orbJobRef = ConfigParser.parseOrbRef(refShape, 'jobs', [nodeOrb]);
 
     expect(
       orbJobRef
@@ -274,7 +278,10 @@ describe('Use a Node orb within a config', () => {
   it('Should not parse a regular job as an orb ref', () => {
     const jobName = 'test';
     const jobParameters = { greeting: 'hi %user%' };
-    const badJobRef = parsers.parseOrbRef({ [jobName]: jobParameters }, 'jobs');
+    const badJobRef = ConfigParser.parseOrbRef(
+      { [jobName]: jobParameters },
+      'jobs',
+    );
 
     expect(badJobRef).toEqual(undefined);
   });
@@ -312,36 +319,44 @@ describe('Use a Node orb within a config', () => {
 
   it('Should parse orb ref job in workflow', () => {
     expect(
-      parsers.parseWorkflow(wfName, contents, [], [nodeOrb]).generateContents(),
+      ConfigParser.parseWorkflow(
+        wfName,
+        contents,
+        [],
+        [nodeOrb],
+      ).generateContents(),
     ).toEqual(contents);
   });
 
   it('Should parse reused orb ref executor', () => {
     expect(
-      parsers
-        .parseExecutor(orbRefExecutor.generate(), [], [nodeOrb])
-        .generate(),
+      ConfigParser.parseExecutor(
+        orbRefExecutor.generate(),
+        [],
+        [nodeOrb],
+      ).generate(),
     ).toEqual(orbRefExecutor.generate());
   });
 
   it('Should parse reused orb ref command', () => {
     expect(
-      parsers
-        .parseStep(
-          'node/install-packages',
-          orbRefCommand.generateContents(),
-          [],
-          [nodeOrb],
-        )
-        .generate(),
+      ConfigParser.parseStep(
+        'node/install-packages',
+        orbRefCommand.generateContents(),
+        [],
+        [nodeOrb],
+      ).generate(),
     ).toEqual(orbRefCommand.generate());
   });
 
   it('Should parse reused orb ref command without body', () => {
     expect(
-      parsers
-        .parseStep('node/install-packages', undefined, [], [nodeOrb])
-        .generate(),
+      ConfigParser.parseStep(
+        'node/install-packages',
+        undefined,
+        [],
+        [nodeOrb],
+      ).generate(),
     ).toEqual('node/install-packages');
   });
 
@@ -388,11 +403,9 @@ describe('Use a Node orb within a config', () => {
     expect(regenerated).toEqual(expected);
     expect(
       parse(
-        parsers
-          .parseConfig(regenerated, {
-            node: nodeManifest,
-          })
-          .stringify(),
+        ConfigParser.parseConfig(regenerated, {
+          node: nodeManifest,
+        }).stringify(),
       ),
     ).toEqual(regenerated);
   });
