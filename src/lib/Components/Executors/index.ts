@@ -6,8 +6,6 @@ import {
   reusable,
   types,
 } from '@circleci/circleci-config-sdk';
-import { Executor } from '@circleci/circleci-config-sdk/dist/src/lib/Components/Executors';
-import { ExecutorUsageLiteral } from '@circleci/circleci-config-sdk/dist/src/lib/Components/Executors/types/Executor.types';
 import { errorParsing, parseGenerable } from '../../Config/exports/Parsing';
 import { parseOrbRef } from '../../Orb';
 import { parseParameterList } from '../Parameters';
@@ -24,11 +22,11 @@ export type ReusableExecutorDefinition = {
 
 export type ReusableExecutorDependencies = {
   parametersList?: parameters.CustomParametersList<types.parameter.literals.ExecutorParameterLiteral>;
-  executor: Executor;
+  executor: executors.Executor;
 };
 
 export type ExecutorSubtypeMap = {
-  [key in ExecutorUsageLiteral | 'windows']: {
+  [key in types.executors.executor.ExecutorUsageLiteral | 'windows']: {
     generableType: mapping.GenerableType;
     parse: ExecutorSubtypeParser;
   };
