@@ -6,6 +6,6 @@ export * as schemas from './lib/Schemas';
 /**
  * All parsers to generate components from config objects.
  */
-export * as parsers from './lib/Config/parsers';
+export * as parsers from './lib/Config';
 
 export { Validator } from './lib/Config/exports/Validator';
