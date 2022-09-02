@@ -9,9 +9,7 @@ describe('Parse a "run" step', () => {
   const expectedResult = { run: 'echo hello world' };
 
   it('Should parse and match example', () => {
-    expect(ConfigParser.parsers.parseStep('run', expectedResult.run)).toEqual(
-      run,
-    );
+    expect(ConfigParser.parseStep('run', expectedResult.run)).toEqual(run);
   });
 
   it('Should have the correct static properties', () => {
@@ -22,7 +20,6 @@ describe('Parse a "run" step', () => {
 
 describe('Parse a "checkout" step', () => {
   const checkout = new CircleCI.commands.Checkout();
-  const checkoutBasicResult = { checkout: {} };
   const checkoutWithPath = new CircleCI.commands.Checkout({ path: './src' });
 
   it('Should produce checkout string', () => {
@@ -31,7 +28,7 @@ describe('Parse a "checkout" step', () => {
 
   it('Should parse steps list with command as string from YAML parse result and match raw example', () => {
     expect(
-      ConfigParser.parsers.parseSteps(
+      ConfigParser.parseSteps(
         parse(`steps:
     - checkout
     `).steps,
@@ -40,9 +37,9 @@ describe('Parse a "checkout" step', () => {
   });
 
   it('Should parse and match example with provided path', () => {
-    expect(
-      ConfigParser.parsers.parseStep('checkout', { path: './src' }),
-    ).toEqual(checkoutWithPath);
+    expect(ConfigParser.parseStep('checkout', { path: './src' })).toEqual(
+      checkoutWithPath,
+    );
   });
 });
 
@@ -55,7 +52,7 @@ describe('Parse a "setup_remote_docker" step', () => {
   };
   it('Should parse and match example with passed version', () => {
     expect(
-      ConfigParser.parsers.parseStep(
+      ConfigParser.parseStep(
         'setup_remote_docker',
         srdResult.setup_remote_docker,
       ),
@@ -74,10 +71,7 @@ describe('Parse a "restore_cache" step', () => {
   });
   it('Should parse and match example', () => {
     expect(
-      ConfigParser.parsers.parseStep(
-        'restore_cache',
-        restoreExample.restore_cache,
-      ),
+      ConfigParser.parseStep('restore_cache', restoreExample.restore_cache),
     ).toEqual(restore_cache);
   });
 });
@@ -95,7 +89,7 @@ describe('Parse a "save_cache" step', () => {
   });
   it('Should parse and match example', () => {
     expect(
-      ConfigParser.parsers.parseStep('save_cache', saveExample.save_cache),
+      ConfigParser.parseStep('save_cache', saveExample.save_cache),
     ).toEqual(save_cache);
   });
 });
@@ -113,10 +107,7 @@ describe('Parse a "store_artifacts" step', () => {
   };
   it('Should parse and match example', () => {
     expect(
-      ConfigParser.parsers.parseStep(
-        'store_artifacts',
-        storeResult.store_artifacts,
-      ),
+      ConfigParser.parseStep('store_artifacts', storeResult.store_artifacts),
     ).toEqual(storeExample);
   });
 });
@@ -128,10 +119,7 @@ describe('Parse "store_test_results" step', () => {
   });
   it('Should parse and match example', () => {
     expect(
-      ConfigParser.parsers.parseStep(
-        'store_test_results',
-        example.store_test_results,
-      ),
+      ConfigParser.parseStep('store_test_results', example.store_test_results),
     ).toEqual(storeTestResults);
   });
 });
@@ -147,7 +135,7 @@ describe('Parse a "add_ssh_keys" step', () => {
   });
   it('Should parse and match example', () => {
     expect(
-      ConfigParser.parsers.parseStep('add_ssh_keys', sshExample.add_ssh_keys),
+      ConfigParser.parseStep('add_ssh_keys', sshExample.add_ssh_keys),
     ).toEqual(addSSHKeys);
   });
 });
@@ -166,7 +154,7 @@ describe('Parse a Custom Command without parameters', () => {
   };
   it('Should parse and match example', () => {
     expect(
-      ConfigParser.parsers.parseReusableCommand('say_hello', example.say_hello),
+      ConfigParser.parseReusableCommand('say_hello', example.say_hello),
     ).toEqual(reusableCommand);
   });
 });
@@ -174,17 +162,13 @@ describe('Parse a Custom Command without parameters', () => {
 describe('Parse a Reusable command', () => {
   it('Should throw error when parsing without a command being declared', () => {
     expect(() => {
-      ConfigParser.parsers.parseStep('say_hello', { greeting: 'hello world' });
+      ConfigParser.parseStep('say_hello', { greeting: 'hello world' });
     }).toThrowError(`Unknown native command: say_hello`);
   });
 
   it('Should throw error when parsing without a command being declared', () => {
     expect(() => {
-      ConfigParser.parsers.parseStep(
-        'say_hello',
-        { greeting: 'hello world' },
-        [],
-      );
+      ConfigParser.parseStep('say_hello', { greeting: 'hello world' }, []);
     }).toThrowError(`Custom Command say_hello not found in command list.`);
   });
 
@@ -225,10 +209,7 @@ describe('Parse a "attach_workspace" command', () => {
     },
   };
   expect(
-    ConfigParser.parsers.parseStep(
-      'attach_workspace',
-      attachExample.attach_workspace,
-    ),
+    ConfigParser.parseStep('attach_workspace', attachExample.attach_workspace),
   ).toEqual(attachWorkspace.steps[0]);
 });
 
@@ -252,7 +233,7 @@ describe('Parse a "persist_to_workspace" command', () => {
   };
   it('Should parse and match persistWorkspace Example', () => {
     expect(
-      ConfigParser.parsers.parseStep(
+      ConfigParser.parseStep(
         'persist_to_workspace',
         persistExample.persist_to_workspace,
       ),

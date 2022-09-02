@@ -1,5 +1,5 @@
 import { mapping, orb, parameters, types } from '@circleci/circleci-config-sdk';
-import { parseParameterList } from '../Config';
+import { parseParameterList } from '../Components/Parameters';
 
 export const orbImportPattern = /^(.*)\/(.*)@(([0-5])(\.[0-5])?(\.[0-5])?)$/;
 export const UNDEFINED_ORB = new orb.OrbImport('', '', '', '');

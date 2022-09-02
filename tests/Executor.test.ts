@@ -17,7 +17,7 @@ describe('Parse a Docker executor', () => {
     ).toEqual(true);
   });
   it('Should parse', () => {
-    expect(ConfigParser.parsers.parseExecutor(expectedShape)).toEqual(docker);
+    expect(ConfigParser.parseExecutor(expectedShape)).toEqual(docker);
   });
 });
 
@@ -37,7 +37,7 @@ describe('Parse a Machine executor', () => {
   });
 
   it('Should parse', () => {
-    expect(ConfigParser.parsers.parseExecutor(expectedShape)).toEqual(machine);
+    expect(ConfigParser.parseExecutor(expectedShape)).toEqual(machine);
   });
 });
 
@@ -68,7 +68,7 @@ describe('Parse a MacOS Executor', () => {
   });
 
   it('Should parse', () => {
-    expect(ConfigParser.parsers.parseExecutor(expectedShape)).toEqual(macos);
+    expect(ConfigParser.parseExecutor(expectedShape)).toEqual(macos);
   });
 
   it('Should validate', () => {
@@ -81,9 +81,7 @@ describe('Parse a MacOS Executor', () => {
   });
 
   it('Should parse', () => {
-    expect(ConfigParser.parsers.parseExecutor(expectedShapeLarge)).toEqual(
-      macosLarge,
-    );
+    expect(ConfigParser.parseExecutor(expectedShapeLarge)).toEqual(macosLarge);
   });
 });
 
@@ -112,12 +110,12 @@ describe('Parse Windows Executor', () => {
   });
 
   it('Should parse', () => {
-    expect(ConfigParser.parsers.parseExecutor(expectedShape)).toEqual(windows);
+    expect(ConfigParser.parseExecutor(expectedShape)).toEqual(windows);
   });
 
   it('Should throw error if fails validation', () => {
     expect(() => {
-      ConfigParser.parsers.parseExecutor({ not_an_executor: {} });
+      ConfigParser.parseExecutor({ not_an_executor: {} });
     }).toThrowError('No executor found.');
   });
 });
@@ -141,9 +139,7 @@ describe('Parse a 2xlarge Docker Executor', () => {
   });
 
   it('Should parse', () => {
-    expect(ConfigParser.parsers.parseExecutor(expectedShape)).toEqual(
-      xxlDocker,
-    );
+    expect(ConfigParser.parseExecutor(expectedShape)).toEqual(xxlDocker);
   });
 });
 
@@ -170,7 +166,7 @@ describe('Parse a Large Machine Executor', () => {
   });
 
   it('Should parse the large machine', () => {
-    expect(ConfigParser.parsers.parseExecutor(expectedShapeLarge)).toEqual(
+    expect(ConfigParser.parseExecutor(expectedShapeLarge)).toEqual(
       machineLarge,
     );
   });
@@ -194,7 +190,7 @@ describe('Parse a Medium Machine Executor', () => {
   });
 
   it('Should parse the medium machine', () => {
-    expect(ConfigParser.parsers.parseExecutor(expectedShapeMedium)).toEqual(
+    expect(ConfigParser.parseExecutor(expectedShapeMedium)).toEqual(
       machineMedium,
     );
   });
@@ -225,7 +221,7 @@ describe('Parse a Reusable Executor with Parameters', () => {
 
   it('Should throw error during parsing', () => {
     expect(() => {
-      ConfigParser.parsers.parseExecutor(expectedUsageShape);
+      ConfigParser.parseExecutor(expectedUsageShape);
     }).toThrowError('Reusable executor default not found in config');
   });
 
@@ -242,7 +238,7 @@ describe('Parse a Reusable Executor with Parameters', () => {
   });
 
   it('Should produce a config with executors', () => {
-    expect(ConfigParser.parsers.parseReusableExecutors(executorsList)).toEqual(
+    expect(ConfigParser.parseReusableExecutors(executorsList)).toEqual(
       myConfig.executors,
     );
   });
