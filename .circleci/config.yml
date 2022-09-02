@@ -1,0 +1,131 @@
+
+version: 2.1
+orbs:
+  node: circleci/node@5.0
+  codecov: codecov/codecov@3.2
+
+commands:
+  update-version:
+    description: Updates the version in the package.json file to match the tag.
+    steps:
+      - run:
+          name: Set Package Version
+          command: |
+            # If "$CIRCLE_TAG" is not set, then set to dev version
+            if [ -z "$CIRCLE_TAG" ]; then
+              CIRCLE_TAG="0.0.0-development"
+            fi
+            # Set package.json version to match tag
+            jq --arg semver "$CIRCLE_TAG" '.version = $semver' package.json > package.json.tmp
+            mv package.json.tmp package.json
+            rm -f package.json.tmp
+            # update package-version.json
+            rm -f ./src/package-version.json
+            echo "{\"version\": \"$CIRCLE_TAG\"}" > ./src/package-version.json
+
+jobs:
+  test:
+    parameters:
+      version:
+        type: string
+    executor:
+      name: node/default
+      tag: << parameters.version >>
+    parallelism: 3
+    steps:
+      - checkout
+      - node/install-packages
+      - run: npm test -- --coverageThreshold '{}' $(circleci tests glob "tests/*.ts" | circleci tests split)
+      - codecov/upload:
+          file: coverage/lcov.info
+
+  deploy-docs:
+    executor: node/default
+    steps:
+      - checkout
+      # The project has not yet been run on CircleCI so we can not add the SSH key
+      # After the first run on CircleCI after the initial project setup, this must be updated
+      # - add_ssh_keys:
+      #     fingerprints:
+      #       - 'fe:98:73:d4:14:87:89:62:38:63:9f:be:33:14:32:01'
+      - node/install-packages
+      - update-version
+      - run:
+          name: Build Docs
+          command: npm run build:docs
+      - run:
+          name: Deploy Docs
+          command: |
+            cd docs
+            git config --global user.email "community-partner@circleci.com"
+            git config --global user.name "orb-publisher"
+            git init
+            git add -A
+            git commit -m "Deploy-<<pipeline.git.branch>>-<<pipeline.number>> [ci skip]"
+            git push -f git@github.com:CircleCI-Public/circleci-config-parser-ts.git main:gh-pages
+  deploy-package:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages
+      - update-version
+      - run:
+          name: Build NPM Module
+          command: npm run build
+      - run:
+          name: Publish NPM Module
+          command: |
+            # Set NPM Auth
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+            # Get alpha or beta tag and set if available
+            if [ -n "$CIRCLE_TAG" ]; then
+                PATTERN="v[0-9]*\.[0-9]*\.[0-9]*(-(alpha|beta)(\.[0-9]*)?)?"
+                [[ $CIRCLE_TAG =~ $PATTERN ]]
+
+                if [ -n "${BASH_REMATCH[2]}" ]; then
+                    echo "Publishing with ${BASH_REMATCH[2]} tag"
+                    set -- "$@" --tag "${BASH_REMATCH[2]}"
+                fi
+            fi
+            # Publish
+            npm publish --access public "$@"
+workflows:
+  test:
+    jobs:
+      - node/test:
+          name: lint
+          run-command: lint
+          version: "16.12"
+          filters:
+            tags:
+              only: /.*/
+      - test:
+          matrix:
+            parameters:
+              version:
+                - "current"
+                - "lts"
+                - "16.12"
+                - "15.14"
+          filters:
+            tags:
+              only: /.*/
+      - deploy-docs:
+          requires:
+            - test
+            - lint
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+      - deploy-package:
+          context: cci-config-sdk-publishing
+          requires:
+            - test
+            - lint
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
