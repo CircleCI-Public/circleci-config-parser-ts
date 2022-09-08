@@ -91,15 +91,19 @@ new CircleCI.reusable.ParameterizedJob(
 );
 ```
 
-Parsing Orb references requires an OrbManifest, which is a representation of Orbs outward facing properties.
+Parsing Orb references requires an OrbManifest, which is a representation of
+Orbs outward facing properties.
 
 ```typescript
 import fs from 'fs';
 
 const customOrbProps = {
-  jobs: { // component type
-    say_hello: { // name of component 
-      greeting: { // component parameters
+  jobs: {
+    // component type
+    say_hello: {
+      // name of component
+      greeting: {
+        // component parameters
         type: 'string',
       },
     },
@@ -124,5 +128,7 @@ const customOrbProps = {
 const customOrbManifest = ConfigParser.parseOrbManifest(customOrbProps);
 
 const configSrc = fs.readFileSync('./config.yml', 'utf8');
-const config = ConfigParser.parseConfig(configSrc, { 'custom-orb': customOrbManifest });
+const config = ConfigParser.parseConfig(configSrc, {
+  'custom-orb': customOrbManifest,
+});
 ```
