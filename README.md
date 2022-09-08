@@ -98,12 +98,12 @@ Orbs outward facing properties.
 import fs from 'fs';
 
 const customOrbProps = {
+  // component type
   jobs: {
-    // component type
+    // name of component
     say_hello: {
-      // name of component
+      // component parameters
       greeting: {
-        // component parameters
         type: 'string',
       },
     },
