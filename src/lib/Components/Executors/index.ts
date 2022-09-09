@@ -6,6 +6,7 @@ import {
   reusable,
   types,
 } from '@circleci/circleci-config-sdk';
+import { DockerImageShape } from '@circleci/circleci-config-sdk/dist/src/lib/Components/Executors/exports/DockerImage';
 import { errorParsing, parseGenerable } from '../../Config/exports/Parsing';
 import { parseOrbRef } from '../../Orb';
 import { parseParameterList } from '../Parameters';
@@ -40,7 +41,6 @@ export type UnknownExecutableShape = {
 export type ExecutorSubtypeParser = (
   args: unknown,
   resourceClass: types.executors.executor.AnyResourceClass,
-  properties?: types.executors.executor.ExecutableProperties,
   reusableExecutors?: reusable.ReusableExecutor[],
   orb?: orb.OrbImport[],
 ) => types.job.AnyExecutor;
@@ -48,58 +48,56 @@ export type ExecutorSubtypeParser = (
 const subtypeParsers: ExecutorSubtypeMap = {
   docker: {
     generableType: mapping.GenerableType.DOCKER_EXECUTOR,
-    parse: (args, resourceClass, properties) => {
-      const dockerArgs = args as [{ image: string }];
+    parse: (args, resourceClass) => {
+      const dockerArgs = args as [DockerImageShape];
       const [mainImage, ...serviceImages] = dockerArgs;
+      const { image, ...properties } = mainImage;
 
       return new executors.DockerExecutor(
-        mainImage.image,
+        image,
         resourceClass as types.executors.docker.DockerResourceClass,
+        properties as Exclude<DockerImageShape, 'image'>,
         serviceImages,
-        properties,
       );
     },
   },
   machine: {
     generableType: mapping.GenerableType.MACHINE_EXECUTOR,
-    parse: (args, resourceClass, properties) => {
+    parse: (args, resourceClass) => {
       const machineArgs = args as Partial<executors.MachineExecutor>;
 
       return new executors.MachineExecutor(
         resourceClass as types.executors.machine.MachineResourceClass,
         machineArgs.image,
-        properties,
       );
     },
   },
   windows: {
     generableType: mapping.GenerableType.WINDOWS_EXECUTOR,
-    parse: (args, resourceClass, properties) => {
+    parse: (args, resourceClass) => {
       const machineArgs = args as Partial<executors.WindowsExecutor>;
 
       return new executors.WindowsExecutor(
         resourceClass as types.executors.windows.WindowsResourceClass,
         machineArgs.image,
-        properties,
       );
     },
   },
   macos: {
     generableType: mapping.GenerableType.MACOS_EXECUTOR,
-    parse: (args, resourceClass, properties) => {
+    parse: (args, resourceClass) => {
       const macOSArgs = args as { xcode: string };
 
       return new executors.MacOSExecutor(
         macOSArgs.xcode,
         resourceClass as types.executors.macos.MacOSResourceClass,
-        properties,
       );
     },
   },
   // Parses a reusable executor by it's name
   executor: {
     generableType: mapping.GenerableType.REUSED_EXECUTOR,
-    parse: (args, _, __, reusableExecutors, orbs) => {
+    parse: (args, _, reusableExecutors, orbs) => {
       const executorArgs = args as
         | { name: string; [key: string]: unknown }
         | string;
@@ -221,7 +219,6 @@ export function parseExecutor(
       return parse(
         args[executorKey as types.executors.executor.ExecutorUsageLiteral],
         resourceClass,
-        extractExecutableProps(executableArgs),
         reusableExecutors,
         orbs,
       );
