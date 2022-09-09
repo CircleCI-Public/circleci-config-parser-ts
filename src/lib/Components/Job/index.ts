@@ -1,7 +1,18 @@
-import * as CircleCI from '@circleci/circleci-config-sdk';
+import {
+  Job,
+  mapping,
+  orb,
+  parameters,
+  reusable,
+  types,
+} from '@circleci/circleci-config-sdk';
 import { parseGenerable } from '../../Config/exports/Parsing';
 import { parseSteps } from '../Commands';
-import { parseExecutor } from '../Executors';
+import {
+  extractExecutableProps,
+  parseExecutor,
+  UnknownExecutableShape,
+} from '../Executors';
 import { parseParameterList } from '../Parameters';
 
 /**
@@ -15,10 +26,10 @@ import { parseParameterList } from '../Parameters';
  */
 export function parseJobList(
   jobListIn: { [key: string]: unknown },
-  ReusableCommands?: CircleCI.reusable.ReusableCommand[],
-  reusableExecutors?: CircleCI.reusable.ReusableExecutor[],
-  orbs?: CircleCI.orb.OrbImport[],
-): CircleCI.Job[] {
+  ReusableCommands?: reusable.ReusableCommand[],
+  reusableExecutors?: reusable.ReusableExecutor[],
+  orbs?: orb.OrbImport[],
+): Job[] {
   return Object.entries(jobListIn).map(([name, args]) =>
     parseJob(name, args, ReusableCommands, reusableExecutors, orbs),
   );
@@ -38,20 +49,21 @@ export function parseJobList(
 export function parseJob(
   name: string,
   jobIn: unknown,
-  ReusableCommands?: CircleCI.reusable.ReusableCommand[],
-  reusableExecutors?: CircleCI.reusable.ReusableExecutor[],
-  orbs?: CircleCI.orb.OrbImport[],
-): CircleCI.Job {
-  return parseGenerable<
-    CircleCI.types.job.UnknownJobShape,
-    CircleCI.Job,
-    CircleCI.types.job.JobDependencies
-  >(
-    CircleCI.mapping.GenerableType.JOB,
+  ReusableCommands?: reusable.ReusableCommand[],
+  reusableExecutors?: reusable.ReusableExecutor[],
+  orbs?: orb.OrbImport[],
+): Job {
+  return parseGenerable<UnknownJobShape, Job, types.job.JobDependencies>(
+    mapping.GenerableType.JOB,
     jobIn,
-    (_, { executor, steps, parametersList }) => {
+    (jobIn, { executor, steps, parametersList }) => {
+      const optionalProps = {
+        ...extractExecutableProps(jobIn as UnknownExecutableShape),
+        parallelism: jobIn.parallelism,
+      };
+
       if (parametersList) {
-        return new CircleCI.reusable.ParameterizedJob(
+        return new reusable.ParameterizedJob(
           name,
           executor,
           parametersList,
@@ -59,12 +71,10 @@ export function parseJob(
         );
       }
 
-      return new CircleCI.Job(name, executor, steps);
+      return new Job(name, executor, steps, optionalProps);
     },
     (jobArgs) => {
       let parametersList;
-
-      console.log(orbs);
 
       const executor = parseExecutor(jobArgs, reusableExecutors, orbs);
       const steps = parseSteps(jobArgs.steps, ReusableCommands, orbs);
@@ -72,8 +82,8 @@ export function parseJob(
       if (jobArgs.parameters) {
         parametersList = parseParameterList(
           jobArgs.parameters,
-          CircleCI.mapping.ParameterizedComponent.JOB,
-        ) as CircleCI.parameters.CustomParametersList<CircleCI.types.parameter.literals.JobParameterLiteral>;
+          mapping.ParameterizedComponent.JOB,
+        ) as parameters.CustomParametersList<types.parameter.literals.JobParameterLiteral>;
       }
 
       return { executor, steps, parametersList };
@@ -81,3 +91,20 @@ export function parseJob(
     name,
   );
 }
+
+export type UnknownJobShape = {
+  [key: string]: unknown;
+  steps: {
+    [key: string]: unknown;
+  }[];
+  resource_class: string;
+  parameters?: {
+    [key: string]: unknown;
+  };
+  environment?: {
+    [key: string]: string;
+  };
+  shell: string;
+  working_directory: string;
+  parallelism: number;
+};
