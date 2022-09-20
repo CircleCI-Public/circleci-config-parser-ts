@@ -155,7 +155,7 @@ const subtypeParsers: ExecutorSubtypeMap = {
 export function extractExecutableProps(
   executable: UnknownExecutableShape,
 ): types.executors.executor.ExecutableProperties {
-  const keys = ['description', 'shell', 'working_directory', 'environment'];
+  const keys = ['shell', 'working_directory', 'environment'];
   let notNull = false;
   const values = Object.assign(
     {},
