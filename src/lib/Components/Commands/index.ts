@@ -6,7 +6,6 @@ import {
   reusable,
   types,
 } from '@circleci/circleci-config-sdk';
-import { OrbImport } from '@circleci/circleci-config-sdk/dist/src/lib/Orb';
 import { parseGenerable, errorParsing } from '../../Config/exports/Parsing';
 import { parseOrbRef } from '../../Orb';
 import { parseParameterList } from '../Parameters';
@@ -177,7 +176,7 @@ export function parseStep(
  */
 export function parseReusableCommands(
   commandListIn: { [key: string]: unknown },
-  orbs?: OrbImport[],
+  orbs?: orb.OrbImport[],
 ): reusable.ReusableCommand[] {
   const parsed: reusable.ReusableCommand[] = [];
 
@@ -201,7 +200,7 @@ export function parseReusableCommand(
   name: string,
   args: unknown,
   custom_commands?: reusable.ReusableCommand[],
-  orbs?: OrbImport[],
+  orbs?: orb.OrbImport[],
 ): reusable.ReusableCommand {
   return parseGenerable<
     types.command.ReusableCommandBodyShape,
