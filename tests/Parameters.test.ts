@@ -1,6 +1,6 @@
 import * as CircleCI from '@circleci/circleci-config-sdk';
-import * as ConfigParser from '../src/index';
 import { parse as yamlParse } from 'yaml';
+import * as ConfigParser from '../src/index';
 
 describe('Parse yaml pipeline parameters', () => {
   const parametersIn = yamlParse(`
@@ -283,5 +283,98 @@ describe('Parse yaml env_var_name parameter and validate', () => {
     expect(ConfigParser.parseParameter(parameterIn, parameterName)).toEqual(
       expectedParameter,
     );
+  });
+});
+
+describe('Parse component parameters', () => {
+  const parametersIn = {
+    'override-executor': {
+      type: 'executor',
+      default: 'my-executor',
+    },
+    'extra-steps': {
+      type: 'steps',
+      default: [
+        {
+          run: {
+            command: 'echo "hello world"',
+          },
+        },
+      ],
+    },
+  };
+
+  const reusableExecutor = new CircleCI.reusable.ReusableExecutor(
+    'my-executor',
+    new CircleCI.executors.DockerExecutor('cimg/node:current'),
+  );
+
+  const expectedParameters =
+    new CircleCI.parameters.CustomParametersList<CircleCI.types.parameter.literals.JobParameterLiteral>(
+      [
+        new CircleCI.parameters.CustomParameter(
+          'override-executor',
+          CircleCI.mapping.ParameterSubtype.EXECUTOR,
+          reusableExecutor.name,
+        ),
+        new CircleCI.parameters.CustomParameter(
+          'extra-steps',
+          CircleCI.mapping.ParameterSubtype.STEPS,
+          [new CircleCI.commands.Run({ command: 'echo "hello world"' })],
+        ),
+      ],
+    );
+
+  it('Should validate parameters', () => {
+    const result = ConfigParser.Validator.validateGenerable(
+      CircleCI.mapping.GenerableType.CUSTOM_PARAMETERS_LIST,
+      parametersIn,
+      CircleCI.mapping.ParameterizedComponent.JOB,
+    );
+
+    expect(result).toEqual(true);
+  });
+
+  it('Should parse parameters', () => {
+    expect(ConfigParser.parseParameterList(parametersIn)).toEqual(
+      expectedParameters,
+    );
+  });
+
+  it('Should throw error if no parameter list is found', () => {
+    expect(() => {
+      ConfigParser.parseParameterList(
+        { invalid_parameter: {} },
+        CircleCI.mapping.ParameterizedComponent.JOB,
+      );
+    }).toThrowError('Could not find valid parameter list in provided object');
+  });
+
+  it('Should validate integer parameters', () => {
+    const parameterIn = yamlParse(`
+    type: integer
+    default: 2021`);
+
+    const result = ConfigParser.Validator.validateGenerable(
+      CircleCI.mapping.GenerableType.CUSTOM_PARAMETER,
+      parameterIn,
+      CircleCI.mapping.ParameterizedComponent.PIPELINE,
+    );
+
+    expect(result).toEqual(true);
+  });
+
+  it('Should not validate float parameters', () => {
+    const parameterIn = yamlParse(`
+    type: integer
+    default: 1.01`);
+
+    const result = ConfigParser.Validator.validateGenerable(
+      CircleCI.mapping.GenerableType.CUSTOM_PARAMETER,
+      parameterIn,
+      CircleCI.mapping.ParameterizedComponent.PIPELINE,
+    );
+
+    expect(result).not.toEqual(true);
   });
 });

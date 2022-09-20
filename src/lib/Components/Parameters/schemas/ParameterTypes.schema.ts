@@ -115,7 +115,7 @@ const ExecutorParameterSchema: SchemaObject = {
   type: 'object',
   additionalProperties: false,
   description:
-    'https://circleci.com/docs/2.0/reusing-config/#steps\n\nSteps are used when you have a job or command that needs to mix predefined and user-defined steps. When passed in to a command or job invocation, the steps passed as parameters are always defined as a sequence, even if only one step is provided.',
+    'https://circleci.com/docs/reusing-config/#steps\n\nSteps are used when you have a job or command that needs to mix predefined and user-defined steps. When passed in to a command or job invocation, the steps passed as parameters are always defined as a sequence, even if only one step is provided.',
   required: ['type'],
   properties: {
     type: {
@@ -125,7 +125,7 @@ const ExecutorParameterSchema: SchemaObject = {
       type: 'string',
     },
     default: {
-      type: 'object',
+      type: 'string',
       // $ref: '/executors/Executor',
     },
   },

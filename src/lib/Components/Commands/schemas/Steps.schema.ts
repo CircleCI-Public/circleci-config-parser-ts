@@ -70,7 +70,6 @@ const StepSchema: SchemaObject = {
 const StepsSchema: SchemaObject = {
   $id: '#/definitions/Steps',
   type: 'array',
-  minItems: 1,
   items: { $ref: '#/definitions/Step' },
 };
 

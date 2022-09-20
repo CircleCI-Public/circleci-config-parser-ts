@@ -1,6 +1,7 @@
 import * as CircleCI from '@circleci/circleci-config-sdk';
 import { errorParsing, parseGenerable } from '../../Config/exports/Parsing';
 import { Validator } from '../../Config/exports/Validator';
+import { parseSteps } from '../Commands';
 
 const parameterMappings: {
   [key in Exclude<
@@ -69,10 +70,16 @@ export function parseParameter(
     CircleCI.mapping.GenerableType.CUSTOM_PARAMETER,
     customParamIn,
     (customParam) => {
+      let defaultValue = customParam.default;
+
+      if (customParam.type === 'steps' && defaultValue) {
+        defaultValue = parseSteps(defaultValue);
+      }
+
       return new CircleCI.parameters.CustomParameter(
         name,
         customParam.type,
-        customParam.default,
+        defaultValue,
         customParam.description,
       );
     },
