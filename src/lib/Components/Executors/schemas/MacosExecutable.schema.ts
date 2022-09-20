@@ -5,7 +5,12 @@ const MacOSExecutableSchema: SchemaObject = {
   type: 'object',
   properties: {
     resource_class: {
-      enum: ['medium', 'large'],
+      enum: [
+        'medium',
+        'large',
+        'macos.x86.medium.gen2',
+        'macos.x86.metal.gen1',
+      ],
     },
     description: {
       type: 'string',

@@ -43,11 +43,9 @@ jobs:
     executor: node/default
     steps:
       - checkout
-      # The project has not yet been run on CircleCI so we can not add the SSH key
-      # After the first run on CircleCI after the initial project setup, this must be updated
-      # - add_ssh_keys:
-      #     fingerprints:
-      #       - 'fe:98:73:d4:14:87:89:62:38:63:9f:be:33:14:32:01'
+      - add_ssh_keys:
+          fingerprints:
+            - '24:ef:95:fe:a3:c5:52:13:40:4d:5e:80:bc:f9:38:f6'
       - node/install-packages
       - update-version
       - run:
