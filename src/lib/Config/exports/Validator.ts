@@ -86,13 +86,12 @@ const schemaRegistry: ValidationMap = {
       schemas.parameter.lists.PipelineParameterListSchema,
   },
 
-  [mapping.GenerableType.WHEN]: {},
-  [mapping.GenerableType.AND]: {},
-  [mapping.GenerableType.NOT]: {},
-  [mapping.GenerableType.OR]: {},
-  [mapping.GenerableType.EQUAL]: {},
-  [mapping.GenerableType.PARAMETER_REFERENCE]: {},
-  [mapping.GenerableType.TRUTHY]: {},
+  [mapping.GenerableType.WHEN]: schemas.logic.ConditionsSchema,
+  [mapping.GenerableType.AND]: schemas.logic.AndConditionSchema,
+  [mapping.GenerableType.NOT]: schemas.logic.NotConditionSchema,
+  [mapping.GenerableType.OR]: schemas.logic.OrConditionSchema,
+  [mapping.GenerableType.EQUAL]: schemas.logic.EqualConditionSchema,
+  [mapping.GenerableType.TRUTHY]: schemas.logic.TruthyConditionSchema,
 };
 
 /**
