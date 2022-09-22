@@ -5,5 +5,6 @@ export * as parameter from '../Components/Parameters/schemas/';
 export * as executor from '../Components/Executors/schemas/';
 export * as command from '../Components/Commands/schemas/';
 export * as workflow from '../Components/Workflow/schemas/';
+export * as logic from '../Components/Logic/schemas/';
 
 export { JobSchema, ConfigSchema };
