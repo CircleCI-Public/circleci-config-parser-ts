@@ -8,7 +8,7 @@ export const config: webpack.Configuration = {
   module: {
     rules: [
       {
-        test: (modulePath) => {
+        test: (modulePath: string): boolean => {
           return modulePath.endsWith('.ts') && !modulePath.endsWith('test.ts');
         },
         use: [
@@ -28,7 +28,7 @@ export const config: webpack.Configuration = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'index.js',
-    library: 'CircleCI-Parser',
+    library: 'CircleCI',
     libraryTarget: 'umd',
     globalObject: 'this',
   },

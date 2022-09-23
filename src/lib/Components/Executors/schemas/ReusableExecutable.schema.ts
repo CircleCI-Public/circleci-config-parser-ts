@@ -25,19 +25,13 @@ export const ReusableExecutorUsageSchema: SchemaObject = {
 export const ReusableExecutorSchema: SchemaObject = {
   $id: '#/executor/ReusableExecutor',
   type: 'object',
-  $merge: {
-    source: {
-      properties: {
-        parameters: {
-          type: 'object',
-          $ref: '#/parameters/ExecutorParameterList',
-        },
-      },
-    },
-    with: {
-      $ref: '#/executor/Executor',
+  additionalProperties: {
+    parameters: {
+      type: 'object',
+      $ref: '#/parameters/ExecutorParameterList',
     },
   },
+  $ref: '#/executor/Executor',
 };
 
 export const ReusableExecutorsListSchema: SchemaObject = {
