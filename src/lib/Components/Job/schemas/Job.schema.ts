@@ -5,35 +5,28 @@ import { SchemaObject } from 'ajv';
  */
 const JobSchema: SchemaObject = {
   $id: '#/definitions/Job',
-  $merge: {
-    source: {
-      type: 'object',
-      required: ['steps'],
-      properties: {
-        steps: {
-          $ref: '#/definitions/Steps',
-        },
-        parameters: {
-          type: 'object',
-          $ref: '#/parameters/JobParameterList',
-        },
-        parallelism: {
-          type: 'integer',
-          minimum: 1,
-        },
-      },
+  required: ['steps'],
+  additionalProperties: {
+    steps: {
+      $ref: '#/definitions/Steps',
     },
-    with: {
-      anyOf: [
-        {
-          $ref: '#/executor/ReusableExecutorUsage',
-        },
-        {
-          $ref: '#/executor/Executor',
-        },
-      ],
+    parameters: {
+      type: 'object',
+      $ref: '#/parameters/JobParameterList',
+    },
+    parallelism: {
+      type: 'integer',
+      minimum: 1,
     },
   },
+  anyOf: [
+    {
+      $ref: '#/executor/ReusableExecutorUsage',
+    },
+    {
+      $ref: '#/executor/Executor',
+    },
+  ],
 };
 
 export default JobSchema;

@@ -1,8 +1,6 @@
 import Ajv, { ErrorObject, SchemaObject } from 'ajv';
-import ajvMergePatch from 'ajv-merge-patch';
 import { ValidationMap, ValidationResult } from '../types/Validator.types';
 
-import validationError from 'better-ajv-errors';
 import { schemas } from '../../..';
 import { mapping, types } from '@circleci/circleci-config-sdk';
 
@@ -109,8 +107,6 @@ export class Validator extends Ajv {
   private constructor() {
     super({ allowUnionTypes: true, strict: false });
 
-    ajvMergePatch(this);
-
     Object.values(schemaRegistry).forEach((source) => {
       if ('$id' in source) {
         const schema = source as SchemaObject;
@@ -168,7 +164,7 @@ export class Validator extends Ajv {
     const valid = super.validate(schema, data);
 
     if (!valid && Array.isArray(this.errors) && data) {
-      return validationError(schema, data, this.errors as ErrorObject[]);
+      return { schema, data, errors: this.errors as ErrorObject[] };
     }
 
     return valid;
