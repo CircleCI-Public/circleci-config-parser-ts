@@ -92,6 +92,7 @@ const schemaRegistry: ValidationMap = {
   [mapping.GenerableType.OR]: schemas.logic.OrConditionSchema,
   [mapping.GenerableType.EQUAL]: schemas.logic.EqualConditionSchema,
   [mapping.GenerableType.TRUTHY]: schemas.logic.TruthyConditionSchema,
+  [mapping.GenerableType.PARAMETER_REFERENCE]: {},
 };
 
 /**

@@ -6,59 +6,46 @@ import { SchemaObject } from 'ajv';
 const ConditionsSchema: SchemaObject = {
   $id: '#/logic/condition',
   type: ['object', 'string', 'number', 'boolean'],
-  oneOf: [
-    { $ref: '#/logic/and' },
-    { $ref: '#/logic/or' },
-    { $ref: '#/logic/equal' },
-    { $ref: '#/logic/and' },
-    { $ref: '#/logic/truthy' },
-  ],
+  minProperties: 1,
+  maxProperties: 1,
+  properties: {
+    and: {
+      $ref: '#/logic/and',
+    },
+    or: { $ref: '#/logic/or' },
+    equal: { $ref: '#/logic/equal' },
+    not: { $ref: '#/logic/not' },
+    truthy: { $ref: '#/logic/truthy' },
+  },
+  additionalProperties: false,
 };
 
 const AndConditionSchema: SchemaObject = {
   $id: '#/logic/and',
-  type: 'object',
-  properties: {
-    and: {
-      type: 'array',
-      items: { $ref: '#/logic/condition' },
-    },
-  },
+  type: 'array',
+  items: { $ref: '#/logic/condition' },
 };
 
 const OrConditionSchema: SchemaObject = {
   $id: '#/logic/or',
-  type: 'object',
-  properties: {
-    or: {
-      type: 'array',
-      items: { $ref: '#/logic/condition' },
-    },
-  },
+  type: 'array',
+  items: { $ref: '#/logic/condition' },
 };
 
 const EqualConditionSchema: SchemaObject = {
   $id: '#/logic/equal',
-  type: 'object',
-  properties: {
-    equal: {
-      oneOf: [
-        {
-          type: ['array'],
-          items: { $ref: '#/logic/truthy' },
-        },
-        { type: ['string', 'number', 'boolean'] },
-      ],
+  oneOf: [
+    {
+      type: ['array'],
+      items: { $ref: '#/logic/truthy' },
     },
-  },
+    { type: ['string', 'number', 'boolean'] },
+  ],
 };
 
 const NotConditionSchema: SchemaObject = {
   $id: '#/logic/not',
-  type: 'object',
-  properties: {
-    not: { $ref: '#/logic/condition' },
-  },
+  $ref: '#/logic/condition',
 };
 
 const TruthyConditionSchema: SchemaObject = {
