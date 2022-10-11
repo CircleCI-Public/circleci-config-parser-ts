@@ -8,7 +8,10 @@ let parseStack: string[] = [];
 export function parseGenerable<
   InputShape,
   OutputGenerable extends OneOrMoreGenerable,
-  GenerableDependencies extends Record<string, OneOrMoreGenerable> = never,
+  GenerableDependencies extends Record<
+    string,
+    OneOrMoreGenerable | unknown
+  > = never,
 >(
   component: CircleCI.mapping.GenerableType,
   input: unknown,
@@ -31,12 +34,18 @@ export function parseGenerable<
     ? parseDependencies(inputShape)
     : ({} as GenerableDependencies);
 
-  const valid = Validator.validateGenerable(component, input || null, subtype);
+  if (parseStack.length == 1) {
+    const valid = Validator.validateGenerable(
+      component,
+      input || null,
+      subtype,
+    );
 
-  if (valid !== true) {
-    throw errorParsing(`Failed to validate: ${valid} 
-    input: ${JSON.stringify(inputShape)}
-    children: ${JSON.stringify(children)}`);
+    if (valid !== true) {
+      throw errorParsing(`Failed to validate: ${JSON.stringify(valid)} 
+      input: ${JSON.stringify(inputShape)}
+      children: ${JSON.stringify(children)}`);
+    }
   }
 
   const result = parse(inputShape, children);
