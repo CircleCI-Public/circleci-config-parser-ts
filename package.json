@@ -22,7 +22,7 @@
   "license": "ISC",
   "dependencies": {
     "@circleci/circleci-config-sdk": "^0.10.1",
-    "ajv": "^8.11.0",
+    "ajv": "^8.11.2",
     "yaml": "2.1.1"
   },
   "devDependencies": {
