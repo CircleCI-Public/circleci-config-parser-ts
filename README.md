@@ -8,6 +8,11 @@ A parsing library for CircleCI configuration files, powered by the
 > to generate an interactive and editable visual representation of your CircleCI
 > config.
 
+## Warning ⚠️
+**This repo is no longer maintained, supported, or monitored by CircleCI. It can be forked for those that would like to continue using it.**
+
+**This code is provided on an ‘as-is’ and ‘as available’ basis without any warranties of any kind. CircleCI disclaims all warranties, express or implied, including, but not limited to, all implied warranties of merchantability, title, fitness for a particular purpose, and noninfringement.**
+
 ## Getting Started
 
 - [View the Parser API Docs](#)
