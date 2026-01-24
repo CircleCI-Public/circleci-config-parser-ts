@@ -5,6 +5,9 @@ const SetupRemoteDockerSchema: SchemaObject = {
   type: ['object', 'null'],
   additionalProperties: false,
   properties: {
+    docker_layer_caching: {
+      type: 'boolean',
+    },
     version: {
       type: 'string',
     },
